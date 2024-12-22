@@ -1,16 +1,23 @@
 "use client";
 
-import { CreateTodo } from "@/service/mutation/create-todo";
+import { createTodo } from "@/service/mutation/todo-mutation";
 import React from "react";
 import { useForm } from "react-hook-form";
 
+interface defaultValue {
+  title?: string;
+  description?: string;
+  id?: string | number;
+  setIsopen?: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-export const CreateForm = () => {
+
+export const CreateForm = (defaultValues: defaultValue) => {
   const { register, handleSubmit, reset } = useForm();
 
   const submit = async (data: any) => {
     try {
-      const res = await CreateTodo(data);
+      const res = await createTodo(data);
       console.log(res);
       reset();
     } catch (error) {

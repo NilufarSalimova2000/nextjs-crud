@@ -1,9 +1,7 @@
 "use client";
 import React from "react";
-import { deleteTodo } from "@/service/mutation/todo-mutation";
-import { editTodo } from "@/service/mutation/edit-todo";
-import { useDispatch } from "react-redux";
-import { EditDataReducer } from "@/store/reducers/reducer";
+import { deleteTodo, editTodo } from "@/service/mutation/todo-mutation";
+
 
 export const Card = ({
   title,
@@ -15,7 +13,6 @@ export const Card = ({
   id: number;
 }) => {
   const [isloading, setLoading] = React.useTransition();
-  const dispatch = useDispatch();
 
   const deleteData = () => {
     setLoading(async () => {
@@ -26,24 +23,26 @@ export const Card = ({
     });
   };
 
-  const EditData = () => {
-    // You don't need to use `useSelector` here as title and description are already passed as props
-    const EditTitle = prompt("Enter Title", title);
-    const EditDes = prompt("Enter Description", description);
-    if (EditTitle && EditDes && id) {
-      // Update Redux state
-      dispatch(EditDataReducer({ title: EditTitle, description: EditDes }));
+  const editData = () => {
+    const newTitle = prompt("Enter new title:", title);
+    const newDescription = prompt("Enter new description:", description);
 
-      // Persist the changes to the backend
-      editTodo({ id, data: { title: EditTitle, description: EditDes } })
-        .then((updatedData) => {
-          console.log("Data updated:", updatedData);
-        })
-        .catch((error) => {
+    if (newTitle && newDescription) {
+      setLoading(async () => {
+        try {
+          const res = await editTodo({
+            title: newTitle,
+            description: newDescription,
+            id,
+          });
+          console.log("Updated data:", res);
+        } catch (error) {
           console.error("Error updating data:", error);
-        });
+        }
+      });
     }
   };
+
   return (
     <div className="mb-[30px]">
       <h1 className="text-4xl text-pink-300 mb-1">{title}</h1>
@@ -56,7 +55,7 @@ export const Card = ({
         {isloading ? "Loading..." : "delete"}
       </button>
       <button
-          onClick={EditData}
+          onClick={editData}
           className="p-[10px] bg-green-400 rounded"
         >
           Edit
